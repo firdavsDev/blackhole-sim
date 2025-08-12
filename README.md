@@ -41,6 +41,13 @@ python -m ui.prototype_matplotlib
 
 The script will produce a low-resolution (200x200) image showing gravitational lensing of the accretion disk.
 
+Run the GPU-based renderer:
+```bash
+python -m ui.vispy_app
+```
+
+The script will create an interactive 3D visualization of the black hole and its surroundings.
+
 ## Units & Physics Notes
 - Units: geometric (G = c = 1), M=1.0 by default
 - Schwarzschild radius: r = 2M
