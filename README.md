@@ -1,4 +1,4 @@
-# Blackhole-sim — Step 1: Scaffold + Core Physics (Schwarzschild)
+# Blackhole-sim: Scaffold + Core Physics (Schwarzschild)
 
 A Python-based black hole visualizer and ray tracer. This project simulates photon paths around a Schwarzschild black hole, including gravitational lensing and an accretion disk with relativistic effects.
 

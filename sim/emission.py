@@ -18,14 +18,8 @@ def disk_emissivity(
 
 
 def emitter_four_velocity(r: float, M: float = 1.0) -> np.ndarray:
-    """Return u^mu for a circular, equatorial, timelike orbit (Keplerian).
-
-    For Schwarzschild, the standard relations give:
-      u^t = 1 / sqrt(1 - 3M/r)
-      u^phi = sqrt(M / r^3) / sqrt(1 - 3M/r)
-    (u^r = u^theta = 0)
-    These are only valid for r > 3M (photon orbit at 3M, ISCO at 6M for timelike).
-    """
+    """Circular Keplerian test-particle 4-velocity in Schwarzschild (equatorial).
+    Valid for r > 3M (photon orbit 3M)."""
     if r <= 3.0 * M:
         return np.array([np.nan, 0.0, 0.0, np.nan])
     denom = np.sqrt(1.0 - 3.0 * M / r)
@@ -35,12 +29,7 @@ def emitter_four_velocity(r: float, M: float = 1.0) -> np.ndarray:
 
 
 def redshift_factor(k_contra: np.ndarray, x: np.ndarray, M: float = 1.0) -> float:
-    """Compute redshift g = nu_obs / nu_emit.
-
-    Observer is taken at infinity with u_obs = (1,0,0,0) in these coords.
-    Photon frequency measured by an observer with 4-velocity u: omega = - k_mu u^mu.
-    So g = omega_obs / omega_emit.
-    """
+    # covariant momentum
     g_cov = schwarzschild_metric(x[1], x[2], M)
     k_cov = g_cov.dot(k_contra)
 
@@ -48,7 +37,8 @@ def redshift_factor(k_contra: np.ndarray, x: np.ndarray, M: float = 1.0) -> floa
     if np.isnan(u_emit[0]):
         return 0.0
 
-    omega_obs = -k_cov[0] * 1.0  # u_obs = (1,0,0,0) at infinity
+    # observer at infinity u_obs = (1,0,0,0) (approx)
+    omega_obs = -k_cov[0] * 1.0
     omega_emit = -float(np.dot(k_cov, u_emit))
     if omega_emit == 0.0:
         return 0.0
@@ -67,8 +57,8 @@ def shade_disk(
         return np.array([0.0, 0.0, 0.0])
 
     g = redshift_factor(k_contra, x)
-    intensity = emiss * (g**3 if g > 0.0 else 0.0)  # I_obs ~ g^3 I_em
+    intensity = emiss * (g**3 if g > 0.0 else 0.0)  # invariant I/nu^3
 
-    # map to a simple warm color map (RGB)
+    # simple warm colormap
     v = np.clip(intensity * 8.0, 0.0, 1.0)
-    return np.array([v, v**0.6, v**0.2])
+    return np.array([v, v**0.7, v**0.3])

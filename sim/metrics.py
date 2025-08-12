@@ -30,31 +30,28 @@ def inverse_metric(r: float, theta: float, M: float = 1.0) -> np.ndarray:
 def christoffel_symbols(coords: tuple, M: float = 1.0) -> np.ndarray:
     """Return Christoffel symbols Gamma^mu_{alpha beta} as a (4,4,4) array.
 
-    The implementation uses the known non-zero components for the Schwarzschild
-    metric in (t,r,theta,phi) coordinates. We add tiny eps denominators to avoid
-    NaNs when code runs very close to the horizon; for a production renderer you
-    will later clamp camera positions away from problematic radii or use regularized coords.
+    Uses closed-form non-zero components for Schwarzschild in standard coords.
     """
     t, r, theta, phi = coords
     eps = 1e-12
     A = 1.0 - 2.0 * M / r
 
-    # initialize
     Gamma = np.zeros((4, 4, 4), dtype=float)
 
-    # Gamma^t_{tr} = Gamma^t_{rt} = M / (r*(r-2M))
+    # Non-zero components (symmetric in lower indices)
+    # Gamma^t_{tr} = Gamma^t_{rt} = M / (r(r-2M))
     Gamma[0, 1, 0] = Gamma[0, 0, 1] = M / (r * (r - 2.0 * M) + eps)
 
-    # Gamma^r_{tt} = M*(2M - r)/r^3
+    # Gamma^r_{tt} = M(2M - r)/r^3
     Gamma[1, 0, 0] = M * (2.0 * M - r) / (r**3 + eps)
 
-    # Gamma^r_{rr} = -M/(r*(r-2M))
+    # Gamma^r_{rr} = -M/(r(r-2M))
     Gamma[1, 1, 1] = -M / (r * (r - 2.0 * M) + eps)
 
-    # Gamma^r_{theta theta} = -(r - 2M)
+    # Gamma^r_{theta theta} = -(r-2M)
     Gamma[1, 2, 2] = -(r - 2.0 * M)
 
-    # Gamma^r_{phi phi} = -(r - 2M) * sin^2(theta)
+    # Gamma^r_{phi phi} = -(r-2M) * sin^2(theta)
     Gamma[1, 3, 3] = -(r - 2.0 * M) * (np.sin(theta) ** 2)
 
     # Gamma^theta_{r theta} = Gamma^theta_{theta r} = 1/r
